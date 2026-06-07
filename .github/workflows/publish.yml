@@ -1,0 +1,65 @@
+# Human friendly display name for the workflow
+name: Publish
+
+# Event triggers that trigger this workflow.
+on:
+    # Run the publish process when a GitHub release is published.
+    release:
+        types: [published]
+
+# List of isolated execution environments for this workflow.
+jobs:
+    # Ensure the artifacts are built and available for this workflow to use
+    Build-HTML:
+        # Human friendly display name for the job
+        name: Build - HTML
+
+        # Minimal set of permissions required to run this job
+        permissions:
+            attestations: write
+            contents: read
+            id-token: write
+
+        # Run the build process to ensure that the HTML files are built
+        uses: ./.github/workflows/build.yml
+
+    # Publish the built HTML files to the host
+    Publish-HTML:
+        # Human friendly display name for the job
+        name: Publish - GitHub Pages
+
+        # Operating system environment for the job's steps to run on.
+        runs-on: ubuntu-slim
+
+        # Least privilege permissions for the job's steps to run with.
+        permissions:
+            attestations: read
+            contents: read
+            id-token: write
+        
+        # Set the execution context for being able to deploy to GitHub Pages
+        environment: github-pages
+
+        # Set of steps to be executed in the job.
+        steps:
+            # Ensure the compiled docs files are available to be published
+            - name: Download Static HTML
+              uses: actions/download-artifact@v8
+              with:
+                  name: Static-HTML
+
+            # Cryptographically verify that the artifact was not tampered with
+            - name: Validate Attestation
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: gh attestation verify package.zip --repo elliot-huffman/Secure-Standardized-Engineering --signer-workflow elliot-huffman/Secure-Standardized-Engineering/.github/workflows/build.yml@${{ github.event_name == 'release' && format('refs/tags/{0}', github.ref_name) || 'refs/heads/main' }}
+
+              # Package the compiled HTML into GitHub Pages format
+            - name: Upload static files as artifact
+              uses: actions/upload-pages-artifact@v5
+              with:
+                path: site/
+
+            # Commit the prepped files to the hosting system
+            - name: Deploy to GitHub Pages
+              uses: actions/deploy-pages@v5
