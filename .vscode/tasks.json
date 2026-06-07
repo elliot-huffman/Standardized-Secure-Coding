@@ -1,0 +1,92 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "detail": "Compiles the docs to static HTML for use with a web server.",
+            "dependsOn": "Install Dependencies",
+            "icon": {
+                "color": "terminal.ansiGreen",
+                "id": "build"
+            },
+            "type": "process",
+            "command": "${workspaceFolder}/.venv/bin/python",
+            "windows": {
+                "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+            },
+            "args": [
+                "-m",
+                "zensical",
+                "build"
+            ],
+            "presentation": {
+                "reveal": "always"
+            },
+            "group": "build"
+        },
+        {
+            "label": "Serve",
+            "detail": "Starts a web server that has hot reload enabled for live editing the docs.",
+            "dependsOn": "Install Dependencies",
+            "icon": {
+                "color": "terminal.ansiYellow",
+                "id": "server"
+            },
+            "type": "process",
+            "command": "${workspaceFolder}/.venv/bin/python",
+            "windows": {
+                "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+            },
+            "args": [
+                "-m",
+                "zensical",
+                "serve"
+            ],
+            "presentation": {
+                "reveal": "always"
+            },
+            "group": "none",
+            "problemMatcher": []
+        },
+        {
+            "label": "Create Python Virtual Environment",
+            "icon": {
+                "color": "terminal.ansiRed",
+                "id": "server-process"
+            },
+            "command": "python3.13",
+            "type": "process",
+            "args": [
+                "-m",
+                "venv",
+                ".venv"
+            ],
+            "group": "none",
+            "hide": true,
+            "problemMatcher": []
+        },
+        {
+            "label": "Install Dependencies",
+            "icon": {
+                "color": "terminal.ansiRed",
+                "id": "sign-in"
+            },
+            "type": "process",
+            "dependsOn": "Create Python Virtual Environment",
+            "command": "${workspaceFolder}/.venv/bin/pip",
+            "windows": {
+                "command": "${workspaceFolder}/.venv/Scripts/pip.exe"
+            },
+            "args": [
+                "install",
+                "-r",
+                "requirements.txt"
+            ],
+            "group": "none",
+            "hide": true,
+            "problemMatcher": []
+        }
+    ]
+}
