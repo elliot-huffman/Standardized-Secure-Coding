@@ -57,6 +57,10 @@ jobs:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: gh attestation verify docs.zip --repo elliot-huffman/Secure-Standardized-Engineering --signer-workflow elliot-huffman/Secure-Standardized-Engineering/.github/workflows/build.yml@${{ github.event_name == 'release' && format('refs/tags/{0}', github.ref_name) || 'refs/heads/main' }}
 
+            # Unzip the compiled HTML files to prepare for hosting
+            - name: Unzip Compiled Files
+              run: unzip docs.zip -d site
+
               # Package the compiled HTML into GitHub Pages format
             - name: Upload static files as artifact
               uses: actions/upload-pages-artifact@v5
