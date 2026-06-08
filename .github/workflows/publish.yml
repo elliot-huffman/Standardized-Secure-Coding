@@ -36,6 +36,9 @@ jobs:
             attestations: read
             contents: read
             id-token: write
+
+        # List of jobs that need to complete successfully before this job can run.
+        needs: Build-HTML
         
         # Set the execution context for being able to deploy to GitHub Pages
         environment: github-pages
